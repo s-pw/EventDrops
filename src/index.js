@@ -1,12 +1,13 @@
 import defaultsDeep from 'lodash.defaultsdeep';
 
+import markerFactory from './marker';
+import markerDraw from './markerDraw';
 import axis from './axis';
 import { getBreakpointLabel } from './breakpoint';
 import bounds from './bounds';
 import defaultConfiguration from './config';
 import dropLine from './dropLine';
 import zoom from './zoom';
-import { addMetaballsDefs } from './metaballs';
 
 import './style.css';
 import { withinRange } from './withinRange';
@@ -17,6 +18,7 @@ export default ({
     global = window,
     ...customConfiguration
 }) => {
+    let markerState = {};
     const initChart = selection => {
         selection.selectAll('svg').remove();
 
@@ -32,15 +34,12 @@ export default ({
             drops,
             zoom: zoomConfig,
             drop: { onClick, onMouseOut, onMouseOver },
-            metaballs,
             label: { width: labelWidth },
             line: { height: lineHeight },
             range: { start: rangeStart, end: rangeEnd },
             margin,
             breakpoints,
         } = config;
-
-        const getEvent = () => d3.event; // keep d3.event mutable see https://github.com/d3/d3/issues/2733
 
         // Follow margins conventions (https://bl.ocks.org/mbostock/3019563)
         const width = selection.node().clientWidth - margin.left - margin.right;
@@ -62,20 +61,53 @@ export default ({
             .attr('width', width)
             .classed('event-drop-chart', true);
 
+        svg
+            .merge(root)
+            .attr(
+                'height',
+                d =>
+                    (d.length + 1) * lineHeight +
+                    margin.top +
+                    margin.bottom +
+                    10
+            );
+
+        const zoomContainer = svg
+            .append('g')
+            .classed('viewport', true)
+            .attr('height', '30')
+            .attr('width', width)
+            .attr('transform', `translate(${margin.left},${margin.top})`);
+
+        zoomContainer
+            .append('rect')
+            .attr('height', '30')
+            .attr('width', width)
+            .attr('opacity', '0')
+            .attr('transform', `translate(${margin.left},${margin.top})`);
+
+        const stampContainer = svg
+            .append('g')
+            .classed('timeline-pf-timestamp', true)
+            .attr('height', 30)
+            .attr('transform', `translate(${margin.left},${margin.top})`);
+
         if (zoomConfig) {
-            svg.call(zoom(d3, svg, config, xScale, draw, getEvent));
+            zoomContainer.call(zoom(d3, svg, config, xScale, draw));
         }
 
-        if (metaballs) {
-            svg.call(addMetaballsDefs(config));
-        }
-
-        svg.merge(root).attr(
-            'height',
-            d => (d.length + 1) * lineHeight + margin.top + margin.bottom
+        markerState = markerFactory(
+            d3,
+            svg,
+            stampContainer,
+            d3.timeFormat('%H:%M:%S'),
+            chart,
+            config
         );
+        chart.marker = markerState;
 
-        svg.append('g')
+        const viewport = svg
+            .append('g')
             .classed('viewport', true)
             .attr('transform', `translate(${margin.left},${margin.top})`)
             .call(draw(config, xScale));
@@ -96,44 +128,33 @@ export default ({
     };
 
     const draw = (config, scale) => selection => {
-        const {
-            drop: { date: dropDate },
-        } = config;
+        const { drop: { date: dropDate } } = config;
 
         const dateBounds = scale.domain().map(d => new Date(d));
-        const filteredData = selection.data().map(dataSet => {
-            if (!Array.isArray(dataSet)) {
-                throw new Error(
-                    'Selection data is not an array. Are you sure you provided an array of arrays to `data` function?'
-                );
-            }
-
-            return dataSet.map(row => {
-                if (!row.fullData) {
-                    row.fullData = config.drops(row);
-                    if (!row.fullData) {
-                        throw new Error(
-                            'No drops data has been found. It looks by default in the `data` property. You can use the `drops` configuration parameter to tune it.'
-                        );
-                    }
-                }
-
-                row.data = row.fullData.filter(d =>
-                    withinRange(dropDate(d), dateBounds)
-                );
-
-                return row;
-            });
-        });
+        // const filteredData = selection.data().map(dataSet => {
+        //     return dataSet.map(row => {
+        //         if (!row.fullData) {
+        //             row.fullData = config.drops(row);
+        //
+        //         }
+        //
+        //         row.data = row.fullData.filter(d =>
+        //             withinRange(dropDate(d), dateBounds)
+        //         );
+        //
+        //         return row;
+        //     });
+        // });
 
         chart._scale = scale;
-        chart._filteredData = filteredData[0];
-
+        //chart._filteredData = filteredData[0];
+        //marker.updateMarker();
         selection
-            .data(filteredData)
+            .data(selection.data())
             .call(axis(d3, config, scale, chart.currentBreakpointLabel))
-            .call(dropLine(config, scale))
-            .call(bounds(config, scale));
+            .call(dropLine(config, scale, d3))
+            .call(bounds(config, scale))
+            .call(markerDraw(config, scale, markerState));
     };
 
     chart.draw = draw;

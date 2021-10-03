@@ -18,7 +18,9 @@ export default (config, xScale) => selection => {
         .classed('bound', true)
         .attr(
             'transform',
-            `translate(${labelWidth}, ${lineHeight * numberRows + margin.top})`
+            `translate(${labelWidth}, ${lineHeight * numberRows +
+                margin.top -
+                9})`
         );
 
     boundTextGroup

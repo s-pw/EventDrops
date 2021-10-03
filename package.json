@@ -12,7 +12,7 @@
     "url": "https://github.com/marmelab/EventDrops"
   },
   "peerDependencies": {
-    "d3": "~4.7.0"
+    "d3": "~7.1.0"
   },
   "dependencies": {
     "d3-time-format": "^2.1.1",
@@ -31,7 +31,7 @@
     "babel-preset-stage-0": "^6.24.1",
     "configurable.js": "0.1.0",
     "css-loader": "^0.28.1",
-    "d3": "~4.7.0",
+    "d3": "~7.1.0",
     "eslint": "3.19.0",
     "eslint-config-airbnb": "14.1.0",
     "eslint-config-prettier": "^2.9.0",

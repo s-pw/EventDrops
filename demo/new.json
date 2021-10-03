@@ -1,0 +1,71 @@
+{
+  "result": "success",
+  "session": "22ca42bf177f46890aa7490d1a807678",
+  "data": [
+    {
+      "camera": "Front",
+      "path": "@2640184787.bvr",
+      "file": "Front.20210930_000000.bvr",
+      "offset": 0,
+      "date": 1632985200,
+      "color": 9068350,
+      "flags": 257,
+      "res": "3840x2160",
+      "msec": 72893096,
+      "filesize": "20h15m15s (49.6G)",
+      "filetype": "bvr H265 New"
+    },
+    {
+      "camera": "Front",
+      "path": "@2630246332.bvr",
+      "file": "Front.20210929_000002.bvr",
+      "offset": 0,
+      "date": 1632898802,
+      "color": 9068350,
+      "flags": 1,
+      "res": "3840x2160",
+      "msec": 86376583,
+      "filesize": "23h59m58s (55.0G)",
+      "filetype": "bvr H265 New"
+    },
+    {
+      "camera": "Front",
+      "path": "@2620351942.bvr",
+      "file": "Front.20210928_000004.bvr",
+      "offset": 0,
+      "date": 1632812404,
+      "color": 9068350,
+      "flags": 1,
+      "res": "3840x2160",
+      "msec": 86305262,
+      "filesize": "23h59m58s (54.7G)",
+      "filetype": "bvr H265 New"
+    },
+    {
+      "camera": "Front",
+      "path": "@2605222675.bvr",
+      "file": "Front.20210927_000000.bvr",
+      "offset": 0,
+      "date": 1632726000,
+      "color": 9068350,
+      "flags": 1,
+      "res": "3840x2160",
+      "msec": 86382388,
+      "filesize": "1d00h00m04s (54.7G)",
+      "filetype": "bvr H265 New"
+    },
+    {
+      "camera": "Front",
+      "path": "@2595682410.bvr",
+      "file": "Front.20210926_000003.bvr",
+      "offset": 0,
+      "date": 1632639603,
+      "color": 9068350,
+      "flags": 1,
+      "res": "3840x2160",
+      "msec": 86374138,
+      "filesize": "23h59m57s (54.7G)",
+      "filetype": "bvr H265 New"
+    }
+  ]
+}

@@ -1,12 +1,8 @@
-import drop from './drop';
-import indicator from './indicator';
-
-export default (config, xScale) => selection => {
+export default (config, xScale, d3) => selection => {
     const {
-        metaballs,
         label: { text: labelText, padding: labelPadding, width: labelWidth },
         line: { color: lineColor, height: lineHeight },
-        indicator: indicatorEnabled,
+        drop: { onClick, onMouseOver, onMouseOut },
     } = config;
 
     const lines = selection.selectAll('.drop-line').data(d => d);
@@ -30,40 +26,74 @@ export default (config, xScale) => selection => {
         .append('g')
         .classed('drops', true)
         .attr('transform', () => `translate(${labelWidth}, ${lineHeight / 2})`)
-        .call(drop(config, xScale));
-
-    drops
-        .append('rect') // The rect allow us to size the drops g element
-        .attr('x', 0)
-        .attr('y', -config.line.height / 2)
-        .attr('width', 1) // For the rect to impact its parent size it must have a non zero width
-        .attr('height', config.line.height)
-        .attr('fill', 'transparent');
-
-    if (metaballs) {
-        drops.style('filter', 'url(#metaballs)');
-    }
-
-    g
-        .append('text')
-        .classed('line-label', true)
-        .attr('x', labelWidth - labelPadding)
-        .attr('y', lineHeight / 2)
-        .attr('dy', '0.25em')
-        .attr('text-anchor', 'end')
-        .text(labelText);
+        .each((d, idx, nodes) => {
+            if (idx == 0) {
+                d3
+                    .select(nodes[idx])
+                    .selectAll('.drop')
+                    .data(d => d.data)
+                    .enter()
+                    .append('circle')
+                    .classed('drop', true)
+                    .on('click', onClick)
+                    .on('mouseover', onMouseOver)
+                    .on('mouseout', onMouseOut)
+                    .attr('r', 5)
+                    .attr('fill', d => {
+                        const memo = d.memo;
+                        if (memo.includes('person')) {
+                            return d3.schemeCategory10[2];
+                        } else if (
+                            memo.includes('car') ||
+                            memo.includes('truck')
+                        ) {
+                            return d3.schemeCategory10[0];
+                        }
+                        return d3.schemeCategory10[7];
+                    })
+                    .attr('cx', d => xScale(d.date));
+            } else {
+                d3
+                    .select(nodes[idx])
+                    .selectAll('.clip')
+                    .data(d => d.data)
+                    .enter()
+                    .append('rect')
+                    .classed('clip', true)
+                    .on('click', onClick)
+                    .on('mouseover', onMouseOver)
+                    .on('mouseout', onMouseOut)
+                    .on('touchmove', onMouseOver)
+                    .on('touchend', onMouseOut)
+                    .attr('height', 3)
+                    .attr('fill', d => {
+                        if (d.type === 'new') {
+                            return d3.schemeCategory10[2];
+                        } else {
+                            return d3.schemeCategory10[8];
+                        }
+                    })
+                    .attr('y', '-9')
+                    .attr('x', d => xScale(d.date))
+                    .attr(
+                        'width',
+                        d =>
+                            xScale(new Date(d.date.getTime() + d.msec)) -
+                            xScale(d.date)
+                    );
+            }
+        });
 
     lines.selectAll('.line-label').text(labelText);
-    lines.selectAll('.drops').call(drop(config, xScale));
 
-    if (indicatorEnabled) {
-        g
-            .append('g')
-            .classed('indicators', true)
-            .call(indicator(config, xScale));
-
-        lines.selectAll('.indicators').call(indicator(config, xScale));
-    }
+    selection.selectAll('.drop').attr('cx', d => xScale(d.date));
+    selection
+        .selectAll('.clip')
+        .attr('x', d => xScale(d.date))
+        .attr(
+            'width',
+            d => xScale(new Date(d.date.getTime() + d.msec)) - xScale(d.date)
+        );
 
     lines.exit().remove();
 };

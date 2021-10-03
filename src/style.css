@@ -23,5 +23,79 @@
 
 text {
     stroke: none;
-    fill: black;
+    fill: white;
+}
+
+.timeline-pf-timestamp text {
+    fill: #fff;
+
+    font-size: 0.8rem;
+}
+
+.marker {
+    stroke: #777;
+    fill: darkblue;
+    stroke-width: 1px;
+}
+
+.timeline-pf-timestamp rect {
+    fill: #000;
+    opacity: 0.7;
+}
+
+.timeline-pf-marker {
+    pointer-events: none;
+}
+
+.drop {
+    cursor: pointer;
+}
+
+.tooltip {
+    position: absolute;
+    background: #0;
+    padding: 0.5rem 1rem;
+    width: 30rem;
+    line-height: 1.4rem;
+}
+
+.tooltip.left::before {
+    left: 1.65rem;
+}
+
+.tooltip.right::before {
+    right: 1.65rem;
+}
+
+.tooltip .commit {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.tooltip .avatar {
+    width: 5rem;
+    height: 5rem;
+    border-radius: 0.5rem;
+    margin-right: 1rem;
+    flex: 0 0 5rem;
+}
+
+.tooltip .content {
+    flex: 1 0 0;
+}
+
+.tooltip h3 {
+    font-size: 1rem;
+}
+
+.tooltip p {
+    font-size: 0.9rem;
+    color: #777;
+}
+.start,
+.end {
+    font-size: 0.8rem;
 }

@@ -7,7 +7,7 @@ import json from 'rollup-plugin-json';
 
 export default {
     entry: 'src/index.js',
-    format: 'umd',
+    format: 'iife',
     moduleName: 'eventDrops',
     plugins: [
         json(),
@@ -23,7 +23,6 @@ export default {
         commonjs({
             include: 'node_modules/**',
         }),
-        uglify(),
     ],
     external: ['d3'],
     dest: 'dist/index.js',

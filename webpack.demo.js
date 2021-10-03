@@ -3,7 +3,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
     entry: {
-        demo: ['./demo/demo.css', './demo/demo.js'],
+        demo: ['./demo/demo.js'],
     },
     mode: 'development',
     output: {

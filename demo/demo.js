@@ -1,24 +1,11 @@
-import * as d3 from 'd3/build/d3';
+import * as d3 from 'd3';
 
 import eventDrops from '../src';
 import '../src/style.css';
-import { gravatar, humanizeDate } from './utils';
 
-const repositories = require('./data.json');
-
-const numberCommitsContainer = document.getElementById('numberCommits');
-const zoomStart = document.getElementById('zoomStart');
-const zoomEnd = document.getElementById('zoomEnd');
-
-const updateCommitsInformation = chart => {
-    const filteredData = chart
-        .filteredData()
-        .reduce((total, repo) => total.concat(repo.data), []);
-
-    numberCommitsContainer.textContent = filteredData.length;
-    zoomStart.textContent = humanizeDate(chart.scale().domain()[0]);
-    zoomEnd.textContent = humanizeDate(chart.scale().domain()[1]);
-};
+const newJson = require('./new.json');
+const storedJson = require('./stored.json');
+const alertsJson = require('./alerts.json');
 
 const tooltip = d3
     .select('body')
@@ -29,64 +16,93 @@ const tooltip = d3
 
 const chart = eventDrops({
     d3,
-    zoom: {
-        onZoomEnd: () => updateCommitsInformation(chart),
-    },
     drop: {
         date: d => new Date(d.date),
-        onMouseOver: commit => {
-            tooltip
-                .transition()
-                .duration(200)
-                .style('opacity', 1)
-                .style('pointer-events', 'auto');
+        onMouseOver: (event, alert) => {
+            //window.document.getElementById("debug").innerText = event
+            tooltip.style('opacity', 1).style('pointer-events', 'auto');
 
             tooltip
                 .html(
                     `
-                    <div class="commit">
-                    <img class="avatar" src="${gravatar(
-                        commit.author.email
-                    )}" alt="${commit.author.name}" title="${
-                        commit.author.name
-                    }" />
                     <div class="content">
-                        <h3 class="message">${commit.message}</h3>
-                        <p>
-                            <a href="https://www.github.com/${
-                                commit.author.name
-                            }" class="author">${commit.author.name}</a>
-                            on <span class="date">${humanizeDate(
-                                new Date(commit.date)
-                            )}</span> -
-                            <a class="sha" href="${
-                                commit.sha
-                            }">${commit.sha.substr(0, 10)}</a>
-                        </p>
+                        <h3 class="message">${alert.memo}</h3>
+                        <img src="http://10.10.10.105:81/thumbs/${alert.path}"/>
                     </div>
                 `
                 )
-                .style('left', `${d3.event.pageX - 30}px`)
-                .style('top', `${d3.event.pageY + 20}px`);
+                .style('left', `${event.pageX - 30}px`)
+                .style('top', `${event.pageY - 350}px`);
         },
         onMouseOut: () => {
-            tooltip
-                .transition()
-                .duration(500)
-                .style('opacity', 0)
-                .style('pointer-events', 'none');
+            tooltip.style('opacity', 0).style('pointer-events', 'none');
+        },
+    },
+    marker: {
+        onSeek: date => {
+            console.log('onSeek ' + date);
+        },
+        onSeekEnd: date => {
+            console.log('onSeekEnd ' + date);
         },
     },
 });
 
-const repositoriesData = repositories.map(repository => ({
-    name: repository.name,
-    data: repository.commits,
-}));
-
+let maxDate = new Date(0);
+let repositoriesData = [
+    {
+        name: 'alerts',
+        data: alertsJson.data.map(d => {
+            let date = new Date(d.date * 1000);
+            if (date > maxDate) maxDate = date;
+            return {
+                date: date,
+                memo: d.memo,
+                path: d.path,
+            };
+        }),
+    },
+    {
+        name: 'clips',
+        data: [
+            ...newJson.data.map(d => {
+                let date = new Date(d.date * 1000);
+                if (date > maxDate) maxDate = date;
+                return {
+                    date: date,
+                    memo: d.file,
+                    msec: d.msec,
+                    path: d.path,
+                    type: 'new',
+                };
+            }),
+            ...storedJson.data.filter(d => d.path.endsWith('bvr')).map(d => {
+                let date = new Date(d.date * 1000);
+                if (date > maxDate) maxDate = date;
+                return {
+                    date: date,
+                    memo: d.file,
+                    msec: d.msec,
+                    path: d.path,
+                    type: 'stored',
+                };
+            }),
+        ],
+    },
+];
+let dateDiff = new Date() - maxDate;
+//move dates from json files to current time for easier development
+repositoriesData[0].data.forEach(
+    d => (d.date = new Date(d.date.getTime() + dateDiff))
+);
+repositoriesData[1].data.forEach(
+    d => (d.date = new Date(d.date.getTime() + dateDiff))
+);
 d3
     .select('#eventdrops-demo')
     .data([repositoriesData])
     .call(chart);
 
-updateCommitsInformation(chart);
+chart.marker.updateMarker(new Date(new Date().getTime()));
+
+//setInterval(()=> {chart.marker.updateMarker(new Date(chart.marker.date.getTime() + 3600000));}, 1000);

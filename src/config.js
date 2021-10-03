@@ -2,10 +2,6 @@ import enLocale from 'd3-time-format/locale/en-US.json';
 
 export default d3 => ({
     locale: enLocale,
-    metaballs: {
-        blurDeviation: 10,
-        colorMatrix: '1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 50 -10',
-    },
     bound: {
         format: d3.timeFormat('%d %B %Y'),
     },
@@ -27,33 +23,31 @@ export default d3 => ({
     drop: {
         color: null,
         radius: 5,
-        date: d => new Date(d),
         onClick: () => {},
         onMouseOver: () => {},
         onMouseOut: () => {},
     },
-    label: {
-        padding: 20,
-        text: d => `${d.name} (${d.data.length})`,
-        width: 200,
+    marker: {
+        onSeek: () => {},
+        onSeekEnd: () => {},
     },
-    indicator: {
-        previousText: '◀',
-        nextText: '▶',
+    label: {
+        padding: 0,
+        width: 0,
     },
     line: {
         color: (_, index) => d3.schemeCategory10[index],
-        height: 40,
+        height: 20,
     },
     margin: {
-        top: 20,
-        right: 10,
-        bottom: 20,
-        left: 10,
+        top: 30,
+        right: 0,
+        bottom: 0,
+        left: 0,
     },
     range: {
-        start: new Date(new Date().getTime() - 3600000 * 24 * 365), // one year ago
-        end: new Date(),
+        start: new Date(new Date().getTime() - 1000 * 3600 * 1),
+        end: new Date(new Date().getTime() + 1000 * 3600 * 1),
     },
     zoom: {
         onZoomStart: null,

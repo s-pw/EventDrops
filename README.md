@@ -1,3 +1,28 @@
+# Timeline for Blue Iris UI3
+
+This component based on [EventDrops](https://github.com/marmelab/EventDrops) is a quick PoC to add timeline functionality to the UI3.
+I'm not planning to support it, fell free to adopt it.
+
+## Development
+
+1.  Run `npm install` (tested with Node v12)
+2.  Run `npm start`
+3.  Open http://localhost:8080/ the UI will auto refresh as you change the code
+
+Note: The bar is rendered quite low to give space for tooltips, if you don't see it, maximize browser window.
+After you are done build with: `./node_modules/.bin/rollup -c` and copy `/dist/*` files to `/ui3/timeline/` on fork [UI3](https://github.com/s-pw/ui3) to test in BI.
+
+### Optional:
+
+Update \*.json files with your Blue Iris JSON API responses (alertlist:confirmed, cliplist:new, cliplist:stored)
+Update URL in demo.js `http://10.10.10.105:81` to point to your BI
+
+---
+
+---
+
+---
+
 # EventDrops
 
 EventDrops is a time based / event series interactive visualization tool powered by D3.js.
