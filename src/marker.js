@@ -4,12 +4,9 @@ export default (
     stampContainer,
     dateFormat,
     chart,
-    config
+    config,
+    markerState
 ) => {
-    let markerState = {
-        date: new Date(),
-    };
-
     const { marker: { onSeek: onSeek, onSeekEnd: onSeekEnd } } = config;
 
     gridContainer
@@ -35,9 +32,9 @@ export default (
         moveMarker(event, true);
     }
 
-    function stopDrag() {
+    function stopDrag(ev) {
         markerState.isDragging = false;
-        onSeekEnd(markerState.date);
+        onSeekEnd(markerState.date, ev);
     }
     //
     // let marker = gridContainer.append('rect')
@@ -49,16 +46,18 @@ export default (
 
     const domain = chart._scale.domain();
 
+    const pos = chart._scale(markerState.date);
     let timeBox = stampContainer
         .append('rect')
         .attr('height', '13')
         .attr('width', '50')
+        .attr('transform', `translate(${pos - 25}, -30)`)
         .style('display', 'none');
 
     let timeStamp = stampContainer
         .append('text')
         .text(dateFormat(domain[1]))
-        .attr('transform', `translate(${chart._scale.range()[1]})`)
+        .attr('transform', `translate(${pos}, -19)`)
         .attr('text-anchor', 'middle');
 
     function moveMarker(event) {

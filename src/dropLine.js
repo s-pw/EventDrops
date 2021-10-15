@@ -43,11 +43,10 @@ export default (config, xScale, d3) => selection => {
                         const memo = d.memo;
                         if (memo.includes('person')) {
                             return d3.schemeCategory10[2];
-                        } else if (
-                            memo.includes('car') ||
-                            memo.includes('truck')
-                        ) {
+                        } else if (memo.includes('car')) {
                             return d3.schemeCategory10[0];
+                        } else if (memo.includes('truck')) {
+                            return d3.schemeCategory10[3];
                         }
                         return d3.schemeCategory10[7];
                     })

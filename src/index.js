@@ -18,7 +18,11 @@ export default ({
     global = window,
     ...customConfiguration
 }) => {
-    let markerState = {};
+    let markerState = {
+        date: new Date(),
+    };
+
+    let range = null;
     const initChart = selection => {
         selection.selectAll('svg').remove();
 
@@ -41,12 +45,15 @@ export default ({
             breakpoints,
         } = config;
 
+        if (range == null) {
+            range = [rangeStart, rangeEnd];
+        }
         // Follow margins conventions (https://bl.ocks.org/mbostock/3019563)
         const width = selection.node().clientWidth - margin.left - margin.right;
 
         const xScale = d3
             .scaleTime()
-            .domain([rangeStart, rangeEnd])
+            .domain(range)
             .range([0, width - labelWidth]);
 
         chart._scale = xScale;
@@ -96,13 +103,14 @@ export default ({
             zoomContainer.call(zoom(d3, svg, config, xScale, draw));
         }
 
-        markerState = markerFactory(
+        markerFactory(
             d3,
             svg,
             stampContainer,
             d3.timeFormat('%H:%M:%S'),
             chart,
-            config
+            config,
+            markerState
         );
         chart.marker = markerState;
 
@@ -130,6 +138,8 @@ export default ({
     const draw = (config, scale) => selection => {
         const { drop: { date: dropDate } } = config;
 
+        range[0] = scale.domain()[0];
+        range[1] = scale.domain()[1];
         const dateBounds = scale.domain().map(d => new Date(d));
         // const filteredData = selection.data().map(dataSet => {
         //     return dataSet.map(row => {

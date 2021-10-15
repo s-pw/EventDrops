@@ -37,13 +37,18 @@ const chart = eventDrops({
         onMouseOut: () => {
             tooltip.style('opacity', 0).style('pointer-events', 'none');
         },
+        onClick: (ev, data) => {
+            chart.marker.updateMarker(data.date);
+        },
     },
     marker: {
         onSeek: date => {
             console.log('onSeek ' + date);
         },
-        onSeekEnd: date => {
-            console.log('onSeekEnd ' + date);
+        onSeekEnd: (date, ev) => {
+            console.log(
+                'onSeekEnd ' + date + 'ev class ' + ev.path[0].className.baseVal
+            );
         },
     },
 });
